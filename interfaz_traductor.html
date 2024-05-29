@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+   <title>Traudctor</title>
+    <script type="text/javascript"> 
+       let arreglo,palabra_ingles; 
+       //Se ejecuta primero la llamada a la función agregarEvento.
+       agregarEvento(window,'load',cargar,false);   
+       function agregarEvento(ele,eve,fun,cap){
+         //Depende del tipo de navegador para que se ejecuta if o else  
+         /*
+
+              El método attachEvent sólo funciona en Internet Explorer y Opera, utilizar el método addEventListener en Firefox, Google Chrome y Safari ( Opera e Internet Explorer a partir de la versión 9).
+
+         */  
+         if(window.attachEvent){	 // Detecta si es navegador Explorer u Opera.
+
+            addAttachEvent('on'+eve,fun);	//Se agrega el evento
+
+            alert("Se ejecuto if");		 
+	       } 
+
+	       else{
+
+	          ele.addEventListener(eve,fun,cap); //Se agrega el evento.
+
+	       }
+
+       	 /*Al terminar la funciòn agregarEvento, 
+
+           Inmediatamente se llama a la función cargar() porque ya se
+
+           cargo la ventana del navegador.
+         */     
+        }
+        function cargar(){
+           alert("Se ejecuto la función cargar() al mostrarse por primera vez la página");
+            //Obtenemos un arreglo de etiquetas input 
+            arreglo=document.getElementsByTagName("input");
+           //Aquí Llamar a la función agregarEvento 
+           agregarEvento(arreglo[0],'keypress',letras,false);
+           agregarEvento(arreglo[1],'click',leerPalabraIngles,false);
+           agregarEvento(arreglo[2],'keypress',letras,false);
+           agregarEvento(arreglo[3],'click',limpiarCajas,false);
+
+       }
+       function leerPalabraIngles(){
+
+          palabra_ingles=arreglo[0].value;
+
+          enviarPalabraServidor();
+       } 
+       function enviarPalabraServidor(){ 
+           conexion = xmlhttprequest();
+           conexion.onreadystatechange = esperaResultado;
+           conexion.open("POST","traducir.php",true);
+           conexion.setRequestHeader("Content-type","application/x-www-form-urlencoded"); 
+            conexion.send("variable_php="+palabra_ingles);
+       }
+       function esperaResultado(){           
+              if(conexion.readyState == 4){
+                 var dato = conexion.responseText;   
+                 document.getElementById("txt_pe").value=dato;   
+                 var imagen = conexion.responseText;
+             imagen=imagen+ ".jpg";
+              alert("Imagen="+imagen);
+              //cambiar el contenido de un contenedor div con innerHTML
+              document.getElementById("imagen").innerHTML = '<img src="'+imagen+'" width="100" height="100">';
+              //document.getElementById("imagen").innerHTML = '';
+              }  
+       } 
+       function xmlhttprequest(){
+           return new XMLHttpRequest();//Objeto de javascript, tiene varios métodos, por ejemplo send()
+       }   
+       function limpiarCajas(){   
+               document.getElementById("txt_pi").value="";
+              document.getElementById("txt_pe").value="";
+          }
+          function letras(){
+                if(  (event.keyCode>=65 && event.keyCode<=122)){
+                    event.returnValue=true;                
+               } 
+               else{
+                    event.returnValue=false;
+               }
+            }
+    </script>
+</head>
+<body>
+
+   <form name="frm_traductor"> 		   			   		   
+      <input type="text" placeholder="Escribe una palabra en ingles" id="txt_pi" ><br>    
+      <input type="button" value="Traducir" id="bt_traducir"><br>
+      <input type="text"  id="txt_pe"><br>                     
+      <input type="button" value="limpiarCajas" id="bt_limpiar"><br><br>
+      <div id="imagen">      
+      </div>   	
+   </form>	
+</body>
+</html>
